@@ -13,3 +13,6 @@ else
   echo "No supported browser found"
   exit 1
 fi
+
+read -p "Name App : " APP_NAME
+read -p "URL App : " APP_URL
