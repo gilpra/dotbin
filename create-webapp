@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ICON_DIR="$HOME/.local/share/applications/icons"
+DESKTOP_DIR="$HOME/.local/share/applications"
+
+if command -v chromium >/dev/null; then
+  BROWSER="chromium"
+elif command -v google-chrome >/dev/null; then
+  BROWSER="google-chrome"
+else
+  echo "No supported browser found"
+  exit 1
+fi
