@@ -25,3 +25,18 @@ fi
 if [[ ! $APP_URL =~ ^[a-zA-Z][a-zA-Z0-9+.-]*: ]]; then
     APP_URL="https://$APP_URL"
 fi
+
+SAFE_NAME=$(echo "$APP_NAME" | tr -cd '[:alnum:]-_' | tr '[:upper:]' '[:lower:]')
+DOMAIN=$(echo "$APP_URL" | sed -E 's#^[a-zA-Z]+://([^/]+).*#\1#')
+FAVICON_URL="https://www.google.com/s2/favicons?domain=$DOMAIN&sz=128"
+ICON_PATH="$ICON_DIR/$SAFE_NAME.png"
+mkdir -p "$ICON_DIR"
+
+if ! curl -fsSL -o "$ICON_PATH" "$FAVICON_URL"; then
+  echo "Could not fetch favicon automatically. Enter PNG icon URL"
+  read -p "Icon URL : " CUSTOM_URL
+  if ! curl -fsSL -o "$ICON_PATH" "$CUSTOM_URL"; then
+    echo "Failed to download custom icon"
+    exit 1
+  fi
+fi
