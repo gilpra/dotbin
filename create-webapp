@@ -16,3 +16,12 @@ fi
 
 read -p "Name App : " APP_NAME
 read -p "URL App : " APP_URL
+
+if ! [[ "$APP_URL" =~ ^https?://[^/]+ ]]; then
+  echo "Invalid URL format"
+  exit 1
+fi
+
+if [[ ! $APP_URL =~ ^[a-zA-Z][a-zA-Z0-9+.-]*: ]]; then
+    APP_URL="https://$APP_URL"
+fi
