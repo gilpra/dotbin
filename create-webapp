@@ -40,3 +40,21 @@ if ! curl -fsSL -o "$ICON_PATH" "$FAVICON_URL"; then
     exit 1
   fi
 fi
+
+DESKTOP_FILE="$DESKTOP_DIR/$SAFE_NAME.desktop"
+
+cat >"$DESKTOP_FILE" <<EOF
+[Desktop Entry]
+Version=1.0
+Name=$APP_NAME
+Comment=$APP_NAME
+Exec="$BROWSER" --app="$APP_URL"
+Terminal=false
+Type=Application
+Icon=$ICON_PATH
+StartupNotify=true
+EOF
+
+chmod +x "$DESKTOP_FILE"
+
+echo "Desktop entry created at: $DESKTOP_FILE"
