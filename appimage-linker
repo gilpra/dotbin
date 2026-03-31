@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+DESKTOP_DIR="$HOME/.local/share/applications"
+ICON_DIR="$HOME/.local/share/applications/icons"
+
+mkdir -p "$DESKTOP_DIR" "$ICON_DIR"
+
