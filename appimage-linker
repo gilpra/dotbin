@@ -27,4 +27,12 @@ FOUND_ICON=$(find /usr/share/icons ~/.local/share/icons \
 
 if [[ -n "$FOUND_ICON" ]]; then
   ICON_PATH="$FOUND_ICON"
+else
+  echo "Could not get icon automatically. Enter PNG icon URL"
+  read -p "Icon URL : " CUSTOM_URL
+
+  if ! curl -fsSL -o "$ICON_PATH" "$CUSTOM_URL"; then
+    echo "Failed to download custom icon"
+    exit 1
+  fi
 fi
