@@ -7,3 +7,5 @@ ICON_DIR="$HOME/.local/share/applications/icons"
 
 mkdir -p "$DESKTOP_DIR" "$ICON_DIR"
 
+read -p "Name App : " APP_NAME
+read -e -p "Path Appimage : " APP_PATH
