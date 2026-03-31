@@ -19,3 +19,12 @@ SAFE_NAME=$(echo "$APP_NAME" |
   tr '[:upper:]' '[:lower:]' |
   sed 's/[^a-z0-9]/-/g; s/-\+/-/g; s/^-//; s/-$//')
 
+ICON_PATH="$ICON_DIR/$SAFE_NAME.png"
+
+FOUND_ICON=$(find /usr/share/icons ~/.local/share/icons \
+  -iname "$SAFE_NAME.svg" \
+  -print -quit)
+
+if [[ -n "$FOUND_ICON" ]]; then
+  ICON_PATH="$FOUND_ICON"
+fi
