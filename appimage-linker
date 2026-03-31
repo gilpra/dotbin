@@ -30,7 +30,6 @@ if [[ -n "$FOUND_ICON" ]]; then
 else
   echo "Could not get icon automatically. Enter PNG icon URL"
   read -p "Icon URL : " CUSTOM_URL
-
   if ! curl -fsSL -o "$ICON_PATH" "$CUSTOM_URL"; then
     echo "Failed to download custom icon"
     exit 1
@@ -52,3 +51,9 @@ StartupNotify=true
 EOF
 
 chmod +x "$DESKTOP_FILE"
+
+if [[ ! -x "$APP_PATH" ]]; then
+  chmod +x "$APP_PATH"
+fi
+
+echo "Desktop entry created at: $DESKTOP_FILE"
