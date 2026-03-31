@@ -36,3 +36,19 @@ else
     exit 1
   fi
 fi
+
+DESKTOP_FILE="$DESKTOP_DIR/$SAFE_NAME.desktop"
+
+cat >"$DESKTOP_FILE" <<EOF
+[Desktop Entry]
+Version=1.0
+Name=$APP_NAME
+Comment=$APP_NAME
+Exec=$(printf '%q' "$APP_PATH")
+Terminal=false
+Type=Application
+Icon=$ICON_PATH
+StartupNotify=true
+EOF
+
+chmod +x "$DESKTOP_FILE"
