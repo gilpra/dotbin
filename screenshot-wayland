@@ -7,3 +7,7 @@ mkdir -p "$DIR"
 
 FILENAME="$(date +"%Y-%m-%d_%H%M%S").png"
 FULLPATH=$DIR/$FILENAME
+
+if [[ ${XDG_SESSION_TYPE:-} != "wayland" ]]; then
+  notify-send "Session must wayland"
+fi
