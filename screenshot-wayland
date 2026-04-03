@@ -4,3 +4,6 @@ set -euo pipefail
 
 DIR="$HOME/Pictures/Screenshots"
 mkdir -p "$DIR"
+
+FILENAME="$(date +"%Y-%m-%d_%H%M%S").png"
+FULLPATH=$DIR/$FILENAME
