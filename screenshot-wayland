@@ -16,3 +16,9 @@ if ! command -v grim >/dev/null; then
   notify-send "Package grim not installed" "Please install it first"
   exit
 fi
+
+if grim "$FULLPATH"; then
+  notify-send -i "$FULLPATH" "Screenshot Successful" "Saved in $FULLPATH"
+else
+  notify-send "Screenshots failed" "An error occurred while taking a screenshot"
+fi
