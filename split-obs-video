@@ -26,3 +26,8 @@ mkdir -p "$OUTPUT_DIR"
 VIDEO_GAME_OUTPUT="$OUTPUT_DIR/${BASENAME}_game-video.mp4"
 AUDIO_GAME_OUTPUT="$OUTPUT_DIR/${BASENAME}_game-audio.m4a"
 MIC_OUTPUT="$OUTPUT_DIR/${BASENAME}_mic.wav"
+
+ffmpeg -y -i "$FULLPATH" \
+  -map 0:v -c:v copy -an "$VIDEO_GAME_OUTPUT" \
+  -map 0:a:m:title:"$DESKTOP_TRACK_NAME" -c:a copy "$AUDIO_GAME_OUTPUT" \
+  -map 0:a:m:title:"$MIC_TRACK_NAME" -c:a pcm_s16le "$MIC_OUTPUT"
