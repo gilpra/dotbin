@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+DESKTOP_TRACK_NAME="Game"
+MIC_TRACK_NAME="Mic"
+
+if [[ "$#" -lt 1 ]]; then
+  echo "Error: Requires at least 1 argument"
+  echo "Usage: $0 <file_path>"
+  exit 1
+fi
+
+VIDEO_DIR=$1
+
+if [[ ! -f "$VIDEO_DIR" ]]; then
+  echo "Error: File not found -> $VIDEO_DIR"
+  exit 1
+fi
