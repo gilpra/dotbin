@@ -31,3 +31,10 @@ ffmpeg -y -i "$FULLPATH" \
   -map 0:v -c:v copy -an "$VIDEO_GAME_OUTPUT" \
   -map 0:a:m:title:"$DESKTOP_TRACK_NAME" -c:a copy "$AUDIO_GAME_OUTPUT" \
   -map 0:a:m:title:"$MIC_TRACK_NAME" -c:a pcm_s16le "$MIC_OUTPUT"
+
+echo ""
+echo "Processing: $FULLPATH"
+echo "Output:"
+echo " Video : $VIDEO_GAME_OUTPUT"
+echo " Game  : $AUDIO_GAME_OUTPUT"
+echo " Mic   : $MIC_OUTPUT"
