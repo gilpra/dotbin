@@ -80,3 +80,12 @@ trap 'rm -f "$FILE_LIST"' EXIT
 for input in "${VALID_INPUTS[@]}"; do
   echo "file '$input'" >>"$FILE_LIST"
 done
+
+echo "Merging ${#VALID_INPUTS[@]} video(s)..."
+echo "File list: $FILE_LIST"
+echo "Output: $OUTPUT_REAL"
+
+# Execute FFmpeg concat
+ffmpeg -f concat -safe 0 -i "$FILE_LIST" -c copy "$OUTPUT_REAL"
+
+echo "Done! Output saved to: $OUTPUT_REAL"
