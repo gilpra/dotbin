@@ -12,3 +12,28 @@ usage() {
   echo "  -h    Show this help message"
   exit 1
 }
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  -o)
+    if [[ -z "${2:-}" ]]; then
+      echo "Error: -o requires an output file argument"
+      exit 1
+    fi
+    OUTPUT="$2"
+    shift 2
+    ;;
+  -h | --help)
+    usage
+    ;;
+  -*)
+    echo "Error: Unknown option '$1'"
+    usage
+    ;;
+  *)
+    INPUTS+=("$1")
+    shift
+    ;;
+  esac
+done
