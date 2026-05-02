@@ -72,3 +72,11 @@ if [[ ! -d "$OUTPUT_DIR" ]]; then
 fi
 OUTPUT_REAL="$(realpath -m "$OUTPUT")"
 
+# Create temporary file list in /tmp
+FILE_LIST="$(mktemp /tmp/merge-videos-filelist.XXXXXX.txt)"
+trap 'rm -f "$FILE_LIST"' EXIT
+
+# Build the file list for FFmpeg concat demuxer
+for input in "${VALID_INPUTS[@]}"; do
+  echo "file '$input'" >>"$FILE_LIST"
+done
