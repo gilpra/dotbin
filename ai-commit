@@ -76,3 +76,23 @@ debug_log() {
     echo -e "${CYAN}[DEBUG] $1${NC}"
   fi
 }
+
+# ============================================
+# Verify git repository
+# ============================================
+if ! git rev-parse --git-dir >/dev/null 2>&1; then
+  log_error "Not a git repository. Please run this script from a git project root."
+  exit 1
+fi
+
+log_info "Git repository found: $(git rev-parse --show-toplevel)"
+
+# ============================================
+# Verify Qwen Code is installed
+# ============================================
+if ! command -v qwen &>/dev/null; then
+  log_error "Qwen Code is not installed. Please install with: npm install -g @qwen-code/qwen-code@latest"
+  exit 1
+fi
+
+debug_log "Qwen Code found at: $(which qwen)"
