@@ -134,3 +134,68 @@ debug_log "Staged files:\n$STAGED_FILES"
 CHANGE_STATS=$(git diff --cached --stat)
 debug_log "Change stats:\n$CHANGE_STATS"
 
+# ============================================
+# Build context for AI
+# ============================================
+log_info "Analyzing changes and generating commit message..."
+echo ""
+
+# Truncate very large diffs (if diff is too big, take only first 20KB)
+if [ ${#STAGED_DIFF} -gt 20000 ]; then
+  log_warning "Diff is very large, truncating to first 20KB for analysis"
+  STAGED_DIFF_TRUNCATED=$(echo "$STAGED_DIFF" | head -c 20000)
+  STAGED_DIFF_TRUNCATED="$STAGED_DIFF_TRUNCATED\n[... diff truncated due to size ...]"
+else
+  STAGED_DIFF_TRUNCATED="$STAGED_DIFF"
+fi
+
+# Build the prompt for Qwen Code
+PROMPT="You are an expert software engineer helping generate professional git commit messages.
+
+TASK: Analyze the code changes below and generate a professional commit message following Conventional Commits format.
+
+STAGED CHANGES (to be committed):
+$STAGED_DIFF_TRUNCATED
+
+CHANGE STATISTICS:
+$CHANGE_STATS
+
+RECENT COMMIT HISTORY (for context):
+$RECENT_COMMITS
+
+CURRENT BRANCH: $CURRENT_BRANCH
+
+REQUIREMENTS:
+1. Follow Conventional Commits format: <type>(<scope>): <subject>
+2. Types: feat (feature), fix (bug fix), docs (documentation), style (code style), refactor (code restructure), test (tests), chore (maintenance), perf (performance), ci (CI/CD)
+3. Subject line: max 72 characters, imperative mood, no period at end
+4. Body (optional): explain WHY and WHAT changed, not HOW (that's in code)
+5. Footer (optional): reference issues, breaking changes, co-authored-by
+6. Semantic clarity: message should clearly indicate impact
+7. Be concise but informative
+
+GUIDELINES:
+- If changes span multiple domains, focus on the primary change
+- If it's a performance improvement, mention the improvement
+- If it's a refactor, briefly explain why (readability, maintainability, etc)
+- Be professional and consistent with the repository style
+
+OUTPUT FORMAT:
+Generate ONLY the commit message. Do not include any explanation, code blocks, or additional text.
+The output should be ready to copy-paste directly into 'git commit -m'.
+
+Generate the commit message now:"
+
+# ============================================
+# Call Qwen Code
+# ============================================
+debug_log "Sending prompt to Qwen Code..."
+
+COMMIT_MESSAGE=$(qwen -p "$PROMPT" --output-format text 2>/dev/null || true)
+
+if [ -z "$COMMIT_MESSAGE" ]; then
+  log_error "Failed to generate commit message from Qwen Code"
+  log_info "Make sure you are authenticated: qwen /auth"
+  exit 1
+fi
+
