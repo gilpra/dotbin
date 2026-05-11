@@ -1,0 +1,43 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# ============================================
+# Configuration
+# ============================================
+OUTPUT_LANG="English"
+VERBOSE=false
+
+# ============================================
+# Parse arguments
+# ============================================
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  --lang)
+    OUTPUT_LANG="$2"
+    shift 2
+    ;;
+  --verbose)
+    VERBOSE=true
+    shift
+    ;;
+  --help)
+    echo "Usage: $0 [OPTIONS]"
+    echo ""
+    echo "Options:"
+    echo "  --lang LANG       Output language (default: English)"
+    echo "  --verbose         Show debug information"
+    echo "  --help            Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  ./ai-commit.sh                    # English output"
+    echo "  ./ai-commit.sh --lang Indonesian  # Indonesian output"
+    echo ""
+    exit 0
+    ;;
+  *)
+    echo "Unknown option: $1"
+    exit 1
+    ;;
+  esac
+done
