@@ -199,3 +199,27 @@ if [ -z "$COMMIT_MESSAGE" ]; then
   exit 1
 fi
 
+# ============================================
+# Output the result
+# ============================================
+echo ""
+echo -e "${CYAN}════════════════════════════════════════════════════════════════${NC}"
+echo -e "${GREEN}Generated Commit Message:${NC}"
+echo -e "${CYAN}════════════════════════════════════════════════════════════════${NC}"
+echo ""
+
+# Text output
+echo "$COMMIT_MESSAGE"
+echo ""
+
+echo -e "${CYAN}════════════════════════════════════════════════════════════════${NC}"
+echo ""
+
+# ============================================
+# Statistics
+# ============================================
+log_info "Change summary:"
+echo "$CHANGE_STATS" | tail -1
+echo ""
+
+log_success "Ready to commit! Copy the message above and use 'git commit -m' with the text."
