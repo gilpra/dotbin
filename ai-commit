@@ -96,3 +96,41 @@ if ! command -v qwen &>/dev/null; then
 fi
 
 debug_log "Qwen Code found at: $(which qwen)"
+
+# ============================================
+# Check if there are staged changes
+# ============================================
+STAGED_DIFF=$(git diff --cached 2>/dev/null || true)
+
+if [ -z "$STAGED_DIFF" ]; then
+  log_warning "No staged changes found. Use 'git add' to stage files."
+  exit 1
+fi
+
+log_success "Found staged changes"
+debug_log "Staged diff size: $(echo "$STAGED_DIFF" | wc -l) lines"
+
+# ============================================
+# Get additional context
+# ============================================
+
+# Git status (short format)
+GIT_STATUS=$(git status --short)
+debug_log "Git status:\n$GIT_STATUS"
+
+# Last few commits for context
+RECENT_COMMITS=$(git log --oneline -5 2>/dev/null || echo "No previous commits")
+debug_log "Recent commits:\n$RECENT_COMMITS"
+
+# Current branch
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+debug_log "Current branch: $CURRENT_BRANCH"
+
+# Staged files list
+STAGED_FILES=$(git diff --cached --name-only)
+debug_log "Staged files:\n$STAGED_FILES"
+
+# Get file count and change stats
+CHANGE_STATS=$(git diff --cached --stat)
+debug_log "Change stats:\n$CHANGE_STATS"
+
