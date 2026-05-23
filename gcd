@@ -22,3 +22,7 @@ if ! git rev-parse HEAD >/dev/null 2>&1; then
   echo "No commit to amend"
   exit 1
 fi
+
+GIT_COMMITTER_DATE="$DATE_INPUT" \
+  GIT_AUTHOR_DATE="$DATE_INPUT" \
+  git commit --amend --date="$DATE_INPUT" --no-edit
