@@ -12,3 +12,13 @@ if [[ $# -eq 0 ]]; then
 fi
 
 DATE_INPUT=$1
+
+if ! date -d "$DATE_INPUT" >/dev/null 2>&1; then
+  echo "Invalid date format"
+  exit 1
+fi
+
+if ! git rev-parse HEAD >/dev/null 2>&1; then
+  echo "No commit to amend"
+  exit 1
+fi
