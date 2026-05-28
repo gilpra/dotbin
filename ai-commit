@@ -152,41 +152,22 @@ else
 fi
 
 # Build the prompt for Gemini Cli
-PROMPT="You are an expert software engineer helping generate professional git commit messages.
+PROMPT="Write a git commit message for these staged changes.
 
-TASK: Analyze the code changes below and generate a professional commit message following Conventional Commits format.
+Files changed:
+$STAGED_FILES
 
-STAGED CHANGES (to be committed):
-$STAGED_DIFF_TRUNCATED
+Diff:
+$STAGED_DIFF
 
-CHANGE STATISTICS:
-$CHANGE_STATS
+Rules:
+- Conventional Commits format: <type>(<scope>): <subject>
+- Types: feat, fix, docs, style, refactor, test, chore, perf, ci
+- Subject: max 72 chars, imperative mood, no period
+- Add body only if change is complex or non-obvious
+- Language: $OUTPUT_LANG
 
-RECENT COMMIT HISTORY (for context):
-$RECENT_COMMITS
-
-CURRENT BRANCH: $CURRENT_BRANCH
-
-REQUIREMENTS:
-1. Follow Conventional Commits format: <type>(<scope>): <subject>
-2. Types: feat (feature), fix (bug fix), docs (documentation), style (code style), refactor (code restructure), test (tests), chore (maintenance), perf (performance), ci (CI/CD)
-3. Subject line: max 72 characters, imperative mood, no period at end
-4. Body (optional): explain WHY and WHAT changed, not HOW (that's in code)
-5. Footer (optional): reference issues, breaking changes, co-authored-by
-6. Semantic clarity: message should clearly indicate impact
-7. Be concise but informative
-
-GUIDELINES:
-- If changes span multiple domains, focus on the primary change
-- If it's a performance improvement, mention the improvement
-- If it's a refactor, briefly explain why (readability, maintainability, etc)
-- Be professional and consistent with the repository style
-
-OUTPUT FORMAT:
-Generate ONLY the commit message. Do not include any explanation, code blocks, or additional text.
-The output should be ready to copy-paste directly into 'git commit -m'.
-
-Generate the commit message now:"
+Output ONLY the commit message, no explanation, no code blocks."
 
 # ============================================
 # Call Gemini Cli
