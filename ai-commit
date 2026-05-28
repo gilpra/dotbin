@@ -7,6 +7,8 @@ set -euo pipefail
 # ============================================
 OUTPUT_LANG="English"
 VERBOSE=false
+MODEL="gemini-2.5-flash-lite"
+MAX_DIFF_BYTES=20000
 
 # ============================================
 # Parse arguments
@@ -88,14 +90,14 @@ fi
 log_info "Git repository found: $(git rev-parse --show-toplevel)"
 
 # ============================================
-# Verify Qwen Code is installed
+# Verify Gemini Cli is installed
 # ============================================
 if ! command -v qwen &>/dev/null; then
-  log_error "Qwen Code is not installed. Please install with: npm install -g @qwen-code/qwen-code@latest"
+  log_error "Gemini Cli is not installed. Please install with: npm install -g @google/gemini-cli@latest"
   exit 1
 fi
 
-debug_log "Qwen Code found at: $(which qwen)"
+debug_log "Gemini Cli found at: $(which qwen)"
 
 # ============================================
 # Check if there are staged changes
@@ -141,15 +143,15 @@ log_info "Analyzing changes and generating commit message..."
 echo ""
 
 # Truncate very large diffs (if diff is too big, take only first 20KB)
-if [ ${#STAGED_DIFF} -gt 20000 ]; then
-  log_warning "Diff is very large, truncating to first 20KB for analysis"
-  STAGED_DIFF_TRUNCATED=$(echo "$STAGED_DIFF" | head -c 20000)
+if [ ${#STAGED_DIFF} -gt "$MAX_DIFF_BYTES" ]; then
+  log_warning "Diff is very large, truncating to first ${MAX_DIFF_BYTES}B for analysis"
+  STAGED_DIFF_TRUNCATED=$(echo "$STAGED_DIFF" | head -c "$MAX_DIFF_BYTES")
   STAGED_DIFF_TRUNCATED="$STAGED_DIFF_TRUNCATED\n[... diff truncated due to size ...]"
 else
   STAGED_DIFF_TRUNCATED="$STAGED_DIFF"
 fi
 
-# Build the prompt for Qwen Code
+# Build the prompt for Gemini Cli
 PROMPT="You are an expert software engineer helping generate professional git commit messages.
 
 TASK: Analyze the code changes below and generate a professional commit message following Conventional Commits format.
@@ -187,14 +189,14 @@ The output should be ready to copy-paste directly into 'git commit -m'.
 Generate the commit message now:"
 
 # ============================================
-# Call Qwen Code
+# Call Gemini Cli
 # ============================================
-debug_log "Sending prompt to Qwen Code..."
+debug_log "Sending prompt to Gemini Cli..."
 
 COMMIT_MESSAGE=$(qwen -p "$PROMPT" --output-format text 2>/dev/null || true)
 
 if [ -z "$COMMIT_MESSAGE" ]; then
-  log_error "Failed to generate commit message from Qwen Code"
+  log_error "Failed to generate commit message from Gemini Cli"
   log_info "Make sure you are authenticated: qwen /auth"
   exit 1
 fi
