@@ -7,41 +7,41 @@ set -euo pipefail
 # ============================================
 OUTPUT_LANG="English"
 VERBOSE=false
-MODEL="gemini-2.5-flash-lite"
+MODEL="opencode/mimo-v2.5-free"
 MAX_DIFF_BYTES=20000
 
 # ============================================
 # Parse arguments
 # ============================================
 while [[ $# -gt 0 ]]; do
-  case $1 in
-  --lang)
-    OUTPUT_LANG="$2"
-    shift 2
-    ;;
-  --verbose)
-    VERBOSE=true
-    shift
-    ;;
-  --help)
-    echo "Usage: $0 [OPTIONS]"
-    echo ""
-    echo "Options:"
-    echo "  --lang LANG       Output language (default: English)"
-    echo "  --verbose         Show debug information"
-    echo "  --help            Show this help message"
-    echo ""
-    echo "Examples:"
-    echo "  ./ai-commit.sh                    # English output"
-    echo "  ./ai-commit.sh --lang Indonesian  # Indonesian output"
-    echo ""
-    exit 0
-    ;;
-  *)
-    echo "Unknown option: $1"
-    exit 1
-    ;;
-  esac
+    case $1 in
+    --lang)
+        OUTPUT_LANG="$2"
+        shift 2
+        ;;
+    --verbose)
+        VERBOSE=true
+        shift
+        ;;
+    --help)
+        echo "Usage: $0 [OPTIONS]"
+        echo ""
+        echo "Options:"
+        echo "  --lang LANG       Output language (default: English)"
+        echo "  --verbose         Show debug information"
+        echo "  --help            Show this help message"
+        echo ""
+        echo "Examples:"
+        echo "  ./ai-commit.sh                    # English output"
+        echo "  ./ai-commit.sh --lang Indonesian  # Indonesian output"
+        echo ""
+        exit 0
+        ;;
+    *)
+        echo "Unknown option: $1"
+        exit 1
+        ;;
+    esac
 done
 
 # ============================================
@@ -58,46 +58,46 @@ NC='\033[0m'
 # Helper functions
 # ============================================
 log_info() {
-  echo -e "${BLUE} $1${NC}"
+    echo -e "${BLUE} $1${NC}"
 }
 
 log_success() {
-  echo -e "${GREEN} $1${NC}"
+    echo -e "${GREEN} $1${NC}"
 }
 
 log_warning() {
-  echo -e "${YELLOW} $1${NC}"
+    echo -e "${YELLOW} $1${NC}"
 }
 
 log_error() {
-  echo -e "${RED} $1${NC}"
+    echo -e "${RED} $1${NC}"
 }
 
 debug_log() {
-  if [ "$VERBOSE" = true ]; then
-    echo -e "${CYAN}[DEBUG] $1${NC}"
-  fi
+    if [ "$VERBOSE" = true ]; then
+        echo -e "${CYAN}[DEBUG] $1${NC}"
+    fi
 }
 
 # ============================================
 # Verify git repository
 # ============================================
 if ! git rev-parse --git-dir >/dev/null 2>&1; then
-  log_error "Not a git repository. Please run this script from a git project root."
-  exit 1
+    log_error "Not a git repository. Please run this script from a git project root."
+    exit 1
 fi
 
 log_info "Git repository found: $(git rev-parse --show-toplevel)"
 
 # ============================================
-# Verify Gemini Cli is installed
+# Verify Opencode is installed
 # ============================================
-if ! command -v qwen &>/dev/null; then
-  log_error "Gemini Cli is not installed. Please install with: npm install -g @google/gemini-cli@latest"
-  exit 1
+if ! command -v opencode &>/dev/null; then
+    log_error "Opencode is not installed. Please install with: npm install -g @google/gemini-cli@latest"
+    exit 1
 fi
 
-debug_log "Gemini Cli found at: $(which qwen)"
+debug_log "Opencode found at: $(which opencode)"
 
 # ============================================
 # Check if there are staged changes
@@ -105,8 +105,8 @@ debug_log "Gemini Cli found at: $(which qwen)"
 STAGED_DIFF=$(git diff --cached 2>/dev/null || true)
 
 if [ -z "$STAGED_DIFF" ]; then
-  log_warning "No staged changes found. Use 'git add' to stage files."
-  exit 1
+    log_warning "No staged changes found. Use 'git add' to stage files."
+    exit 1
 fi
 
 log_success "Found staged changes"
@@ -144,42 +144,41 @@ echo ""
 
 # Truncate very large diffs (if diff is too big, take only first 20KB)
 if [ ${#STAGED_DIFF} -gt "$MAX_DIFF_BYTES" ]; then
-  log_warning "Diff is very large, truncating to first ${MAX_DIFF_BYTES}B for analysis"
-  STAGED_DIFF_TRUNCATED=$(echo "$STAGED_DIFF" | head -c "$MAX_DIFF_BYTES")
-  STAGED_DIFF_TRUNCATED="$STAGED_DIFF_TRUNCATED\n[... diff truncated due to size ...]"
+    log_warning "Diff is very large, truncating to first ${MAX_DIFF_BYTES}B for analysis"
+    STAGED_DIFF_TRUNCATED=$(echo "$STAGED_DIFF" | head -c "$MAX_DIFF_BYTES")
+    STAGED_DIFF_TRUNCATED="$STAGED_DIFF_TRUNCATED\n[... diff truncated due to size ...]"
 else
-  STAGED_DIFF_TRUNCATED="$STAGED_DIFF"
+    STAGED_DIFF_TRUNCATED="$STAGED_DIFF"
 fi
 
-# Build the prompt for Gemini Cli
-PROMPT="Write a git commit message for these staged changes.
+# Build the prompt for Opencode
+PROMPT="Write a Conventional Commit message for these staged changes.
 
-Files changed:
+Language: $OUTPUT_LANG
+Format: type(scope): subject
+Types: feat, fix, docs, style, refactor, test, chore, perf, ci
+Subject <= 72 chars, imperative, no period.
+Add a body only if needed.
+Output only the commit message.
+
+Files:
 $STAGED_FILES
 
 Diff:
 $STAGED_DIFF
-
-Rules:
-- Conventional Commits format: <type>(<scope>): <subject>
-- Types: feat, fix, docs, style, refactor, test, chore, perf, ci
-- Subject: max 72 chars, imperative mood, no period
-- Add body only if change is complex or non-obvious
-- Language: $OUTPUT_LANG
-
-Output ONLY the commit message, no explanation, no code blocks."
+"
 
 # ============================================
-# Call Gemini Cli
+# Call Opencode
 # ============================================
-debug_log "Sending prompt to Gemini Cli..."
+debug_log "Sending prompt to Opencode..."
 
-COMMIT_MESSAGE=$(qwen -p "$PROMPT" --output-format text 2>/dev/null || true)
+COMMIT_MESSAGE=$(opencode run --model "$MODEL" "$PROMPT" 2>/dev/null || true)
 
 if [ -z "$COMMIT_MESSAGE" ]; then
-  log_error "Failed to generate commit message from Gemini Cli"
-  log_info "Make sure you are authenticated: qwen /auth"
-  exit 1
+    log_error "Failed to generate commit message from Opencode"
+    log_info "Make sure you are authenticated: opencode /connect"
+    exit 1
 fi
 
 # ============================================
@@ -193,9 +192,6 @@ echo ""
 
 # Text output
 echo "$COMMIT_MESSAGE"
-echo ""
-
-echo -e "${CYAN}════════════════════════════════════════════════════════════════${NC}"
 echo ""
 
 # ============================================
