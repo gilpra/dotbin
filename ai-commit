@@ -7,7 +7,7 @@ set -euo pipefail
 # ============================================
 OUTPUT_LANG="English"
 VERBOSE=false
-MODEL="opencode/mimo-v2.5-free"
+MODEL="opencode/mimo-v2.6-flash-free"
 MAX_DIFF_BYTES=20000
 
 # ============================================
